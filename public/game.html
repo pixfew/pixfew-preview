@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIXFEW</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles/style.css">
+    <script src="js/app-config.js"></script>
+</head>
+<body>
+    <header>
+
+    </header>
+        <div id="game-wrapper">
+            <div id="game-area">
+            <!-- elementos base que o JavaScript reposiciona ou exibe conforme a sala -->
+            <div id="player"></div>
+            <div id="health-display" aria-label="Vida">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div id="damage-flash"></div>
+            <div id="room-transition"></div>
+            <div id="wall-left"></div>
+            <div id="wall-right-top"></div>
+            <div id="wall-right-bottom"></div>
+            <div id="door"></div>
+            <div id="interaction-popup">Entrar</div>
+            <div id="floor"></div>
+            <div id="area2-block"></div>
+            <div id="memory-pedestal"></div>
+            <div id="memory-unlocked-popup">Memória desbloqueada</div>
+            <div id="room2-wall-left-top"></div>
+            <div id="room2-wall-left-bottom"></div>
+            <div id="platform-1"></div>
+            <div id="platform-2"></div>
+            <div id="platform-3"></div>
+            <div id="platform-4"></div>
+            <div id="platform-5"></div>
+            <div id="area3-wall-left-top"></div>
+            <div id="area3-wall-left-bottom"></div>
+            <div id="area3-wall-right-top"></div>
+            <div id="area3-wall-right-middle"></div>
+            <div id="area3-wall-right-bottom"></div>
+            <div id="room2-wall-right"></div>
+            <div id="wind-zone"></div>
+            <div id="falling-platform"></div>
+            <div id="area4-wall-left-top"></div>
+            <div id="area4-wall-left-bottom"></div>
+            <div id="area4-wall-right-closed"></div>
+            <div id="area4-wall-right-top"></div>
+            <div id="area4-wall-right-bottom"></div>
+            <div id="floor-left"></div>
+            <div id="floor-right"></div>
+            <div id="area5-wall-left-top"></div>
+            <div id="area5-wall-left-bottom"></div>
+            <div id="area5-wall-right"></div>
+            <div id="area6-wall-left"></div>
+            <div id="area6-wall-right"></div>
+            <div id="area6-ceiling-left"></div>
+            <div id="area6-ceiling-right"></div>
+            <div id="area6-platform-1"></div>
+            <div id="area6-platform-2"></div>
+            <div id="area6-platform-3"></div>
+            <div id="area6-platform-4"></div>
+            <div id="memory-fragment"></div>
+            <div id="memory-popup">Fragmento coletado</div>
+            <div id="damage-obstacle"></div>
+            <div id="damage-popup">Dano recebido</div>
+            <div id="area7-ceiling"></div>
+            <div id="area7-wall-left-top"></div>
+            <div id="area7-wall-left-bottom"></div>
+            <div id="area7-wall-right"></div>
+            <div id="area7-secret-mark"></div>
+            <div id="area8-ceiling-left"></div>
+            <div id="area8-ceiling-right"></div>
+            <div id="area8-wall-left"></div>
+            <div id="area8-wall-right-top"></div>
+            <div id="area8-wall-right-bottom"></div>
+            <div id="area8-damage-floor"></div>
+            <div id="area8-platform-1"></div>
+            <div id="area8-platform-2"></div>
+            <div id="area8-platform-3"></div>
+            <div id="area8-platform-4"></div>
+            <div id="area8-platform-5"></div>
+            <div id="area9-ceiling"></div>
+            <div id="area9-wall-left"></div>
+            <div id="area9-wall-right"></div>
+            <div id="area9-floor-left"></div>
+            <div id="area9-floor-right"></div>
+            <div id="area10-ceiling"></div>
+            <div id="area10-wall-left-top"></div>
+            <div id="area10-wall-left-bottom"></div>
+            <div id="area10-wall-right"></div>
+            </div>
+        </div>
+
+    <aside id="debug-panel" aria-label="Painel local de testes" hidden>
+        <h2>Testes locais</h2>
+
+        <label for="debug-room-select">Sala</label>
+        <div class="debug-room-controls">
+            <select id="debug-room-select"></select>
+            <button id="debug-go-to-room" type="button">Ir para sala</button>
+        </div>
+
+        <button id="debug-restore-health" type="button">Restaurar vida</button>
+
+        <label class="debug-option">
+            <input id="debug-fragment-collected" type="checkbox">
+            Fragmento coletado
+        </label>
+
+        <label class="debug-option">
+            <input id="debug-fragment-delivered" type="checkbox">
+            Fragmento entregue
+        </label>
+
+        <label class="debug-option">
+            <input id="debug-room7-wall-open" type="checkbox">
+            Parede da Sala 7 aberta
+        </label>
+
+        <button id="debug-reset-states" type="button">Resetar estados de debug</button>
+    </aside>
+
+        <!-- controles pro mobile -->
+    <div id="mobile-controls" aria-label="Controles do jogo">
+        <div class="mobile-control-group mobile-movement-controls">
+            <button class="mobile-control-button" type="button" data-control="moveLeft" aria-label="Mover para a esquerda">&#9664;</button>
+            <button class="mobile-control-button" type="button" data-control="moveRight" aria-label="Mover para a direita">&#9654;</button>
+        </div>
+        <div class="mobile-control-group mobile-action-controls">
+            <button class="mobile-control-button mobile-action-button" type="button" data-control="interact" aria-label="Interagir" hidden>ENTRAR</button>
+            <button class="mobile-control-button mobile-action-button" type="button" data-control="jump" aria-label="Pular">PULO</button>
+            <button class="mobile-control-button mobile-action-button" type="button" data-control="dash" aria-label="Usar dash">DASH</button>
+        </div>
+    </div>
+
+    <!-- ordem importante: estados globais e elementos precisam existir antes do loop principal -->
+    <script src="js/ui.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/effects.js"></script>
+    <script src="js/rooms.js"></script>
+    <script src="js/collisions.js"></script>
+    <script src="js/health.js"></script>
+    <script src="js/transitions.js"></script>
+    <script src="js/objectives.js"></script>
+    <script src="js/debug.js"></script>
+    <script src="js/main.js"></script>
+    <footer>
+        
+    </footer>
+</body>
+</html>
