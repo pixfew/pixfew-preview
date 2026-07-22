@@ -953,28 +953,6 @@ h1{
 
 }
 
-#damage-obstacle{
-    display: none;
-    width: 80px;
-    height: 30px;
-    background-color: crimson;
-    position: absolute;
-    left: 400px;
-    top: 560px;
-}
-
-#damage-popup{
-    display: none;
-    position: absolute;
-    top: 80px;
-    right: 20px;
-    color: white;
-    background-color: rgba(120, 0, 0, 0.7);
-    padding: 10px 14px;
-    border-radius: 8px;
-    z-index: 5;
-}
-
 /*jato de vento*/
 #wind-zone{
     width: 90px;

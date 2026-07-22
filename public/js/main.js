@@ -241,16 +241,6 @@ function gameLoop(currentTime){
         loadRoom();
     }
 
-    if(
-        currentRoom === 6 &&
-        damageObstacleElement &&
-        checkColision(playerBox, damageObstacle)
-    ){
-        damagePopupElement.style.display = "block";
-    }else{
-        damagePopupElement.style.display = "none";
-    }
-
     //fragmento de memória(popup)
     if(currentRoom === 6 && memoryFragmentElement && checkColision(playerBox, memoryFragment)){
         collectMemoryFragment();

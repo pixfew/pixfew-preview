@@ -124,12 +124,9 @@ const platform5Element = document.getElementById("platform-5");
 //plataforma que cai
 const fallingPlatformElement = document.getElementById("falling-platform");
 
-//fragmento de memória e obstáculo de dano
+//fragmento de memória
 const memoryFragmentElement = document.getElementById("memory-fragment");
 const memoryPopupElement = document.getElementById("memory-popup");
-
-const damageObstacleElement = document.getElementById("damage-obstacle");
-const damagePopupElement = document.getElementById("damage-popup");
 
 //corrente de vento
 const windZoneElement = document.getElementById("wind-zone");

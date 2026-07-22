@@ -652,13 +652,6 @@ const memoryFragment = {
     height: 25
 };
 
-const damageObstacle = {
-    x: 400,
-    y: 560,
-    width: 80,
-    height: 30
-};
-
 const windZone = {
     x: gameWidth - 270,
     y: gameHeight - 300,
@@ -764,14 +757,6 @@ function getElementBox(element){
 function checkWallCollision(playerBox){
 
     checkArea7BreakableWallHit(playerBox);
-
-    if(currentRoom === 6 && damageObstacleElement && checkColision(playerBox, damageObstacle)){
-        if(damagePopupElement){
-            damagePopupElement.style.display = "block";
-        }
-    } else if(damagePopupElement){
-        damagePopupElement.style.display = "none";
-    }
 
     const configs = collisionConfig[currentRoom] || [];
 

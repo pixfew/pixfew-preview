@@ -75,7 +75,6 @@ const rooms = {
         showBlock: false,
         elements: [
             memoryFragmentElement,
-            damageObstacleElement,
             area6WallLeftElement,
             area6WallRightElement,
             area6CeilingLeftElement,
@@ -422,10 +421,6 @@ function loadRoom(){
 
     if(memoryPopupElement){
         memoryPopupElement.style.display = "none";
-    }
-
-    if(damagePopupElement){
-        damagePopupElement.style.display = "none";
     }
 
     //reinicia a plataforma que cai sempre que a sala 4 e recarregada
