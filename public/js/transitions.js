@@ -208,5 +208,6 @@ function checkRoomExit(playerBox){
     }
 
     loadRoom();
+    startRoomEntryControlLock();
     return true;
 }

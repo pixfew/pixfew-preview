@@ -172,9 +172,6 @@ function createArea3RightOpening(start, height){
 
 //carrega a sala atual, resolve spawns especiais e troca os elementos visiveis do mapa
 function loadRoom(){
-
-    showRoomTransition();
-
     const room = rooms[currentRoom];
 
     if(currentRoom === 3){

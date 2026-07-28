@@ -36,6 +36,14 @@
 
     global.PIXFEW_CONFIG = Object.freeze({
         environment,
-        apiBaseUrl
+        apiBaseUrl,
+        save: Object.freeze({
+            // Modos oficiais: "account" usa persistência online; "guest" é temporário.
+            mode: "account",
+            developmentAccount: Object.freeze({
+                playerId: 1,
+                slot: 1
+            })
+        })
     });
 })(window);

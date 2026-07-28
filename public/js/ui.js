@@ -5,32 +5,51 @@ const popup = document.getElementById("interaction-popup");
 const gameArea = document.getElementById("game-area");
 const healthDisplayElement = document.getElementById("health-display");
 const damageFlashElement = document.getElementById("damage-flash");
-const roomTransitionElement = document.getElementById("room-transition");
+const initialCoverElement = document.getElementById("initial-cover");
 
 const gameWidth = gameArea.offsetWidth;
 const gameHeight = gameArea.offsetHeight;
-let roomTransitionMovementLocked = false;
-let roomTransitionUnlockTimer = null;
+let initialRevealMovementLocked = true;
+let initialRevealFallbackTimer = null;
+let initialRevealEndHandler = null;
 
-function showRoomTransition(){
-    roomTransitionMovementLocked = true;
-
-    if(roomTransitionUnlockTimer){
-        clearTimeout(roomTransitionUnlockTimer);
+function clearInitialRevealCompletion(){
+    if(initialRevealFallbackTimer){
+        clearTimeout(initialRevealFallbackTimer);
+        initialRevealFallbackTimer = null;
     }
 
-    roomTransitionUnlockTimer = setTimeout(function(){
-        roomTransitionMovementLocked = false;
-        roomTransitionUnlockTimer = null;
-    }, 800);
+    if(initialCoverElement && initialRevealEndHandler){
+        initialCoverElement.removeEventListener("animationend", initialRevealEndHandler);
+        initialRevealEndHandler = null;
+    }
+}
 
-    if(!roomTransitionElement){
+function finishInitialReveal(){
+    initialRevealMovementLocked = false;
+    clearInitialRevealCompletion();
+}
+
+function revealInitialCover(){
+    initialRevealMovementLocked = true;
+    clearInitialRevealCompletion();
+
+    if(!initialCoverElement){
+        finishInitialReveal();
         return;
     }
 
-    roomTransitionElement.classList.remove("active");
-    void roomTransitionElement.offsetWidth;
-    roomTransitionElement.classList.add("active");
+    initialRevealEndHandler = function(event){
+        if(event.target === initialCoverElement && event.animationName === "initialCoverFade"){
+            finishInitialReveal();
+        }
+    };
+
+    initialCoverElement.addEventListener("animationend", initialRevealEndHandler);
+    initialCoverElement.classList.add("revealing");
+
+    //Fallback caso o navegador nao dispare animationend.
+    initialRevealFallbackTimer = setTimeout(finishInitialReveal, 2500);
 }
 
 //mantem o jogo em 1600x900 por dentro e escala a tela inteira por fora

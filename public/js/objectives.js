@@ -3,6 +3,16 @@ var memoryFragmentDelivered = false;
 var memoryFragmentFollowX = memoryFragment.x;
 var memoryFragmentFollowY = memoryFragment.y;
 var memoryFragmentOrbitAngle = 0;
+var memoryCheckpointSavePending = false;
+var memoryPedestalContactLocked = false;
+
+const memoryPedestalCheckpoint = Object.freeze({
+    name: "pedestal_fragmento",
+    respawn: Object.freeze({
+        x: 700,
+        y: 830
+    })
+});
 
 //objetivo principal atual: coletar o fragmento na sala 6 e entregar no pedestal da sala 2
 const memoryPedestal = {
@@ -20,9 +30,15 @@ function updateMemoryFragmentVisibility(){
 
     if(memoryFragmentDelivered){
         memoryFragmentElement.classList.remove("following");
-        memoryFragmentElement.style.display = "none";
+        memoryFragmentElement.classList.add("on-pedestal");
+        memoryFragmentElement.style.left =
+            memoryPedestal.x + ((memoryPedestal.width - memoryFragment.width) / 2) + "px";
+        memoryFragmentElement.style.top = memoryPedestal.y + 8 + "px";
+        memoryFragmentElement.style.display = currentRoom === 2 ? "block" : "none";
         return;
     }
+
+    memoryFragmentElement.classList.remove("on-pedestal");
 
     if(playerHasMemoryFragment){
         memoryFragmentElement.classList.add("following");
@@ -42,6 +58,7 @@ function collectMemoryFragment(){
     memoryFragmentOrbitAngle = 0;
 
     if(memoryFragmentElement){
+        memoryFragmentElement.classList.remove("on-pedestal");
         memoryFragmentElement.classList.add("following");
         memoryFragmentElement.style.display = "block";
     }
@@ -65,7 +82,38 @@ function collectMemoryFragment(){
     }
 }
 
-//entrega o fragmento no pedestal e libera a passagem que depende da memoria
+function confirmMemoryPedestalDelivery(){
+    playerHasMemoryFragment = false;
+    memoryFragmentDelivered = true;
+    memoryCheckpointSavePending = false;
+
+    updateMemoryFragmentVisibility();
+
+    if(currentRoom === 4){
+        loadRoom();
+    }
+
+    if(memoryUnlockedPopupElement){
+        memoryUnlockedPopupElement.style.display = "block";
+
+        setTimeout(function(){
+            memoryUnlockedPopupElement.style.display = "none";
+        }, 2000);
+    }
+}
+
+function restoreMemoryCheckpoint(saveData){
+    if(!saveData || !saveData.save || saveData.save.checkpoint !== memoryPedestalCheckpoint.name){
+        return;
+    }
+
+    playerHasMemoryFragment = false;
+    memoryFragmentDelivered = true;
+    memoryCheckpointSavePending = false;
+    memoryPedestalContactLocked = true;
+}
+
+//entrega o fragmento apenas depois que a API confirma o checkpoint
 function checkMemoryPedestalDelivery(playerBox){
     if(memoryFragmentDelivered){
         return;
@@ -83,25 +131,39 @@ function checkMemoryPedestalDelivery(playerBox){
         return;
     }
 
-    if(!checkColision(playerBox, memoryPedestal)){
+    const touchingPedestal = checkColision(playerBox, memoryPedestal);
+
+    if(!touchingPedestal){
+        memoryPedestalContactLocked = false;
         return;
     }
 
-    playerHasMemoryFragment = false;
-    memoryFragmentDelivered = true;
-
-    if(memoryFragmentElement){
-        memoryFragmentElement.classList.remove("following");
-        memoryFragmentElement.style.display = "none";
+    if(memoryCheckpointSavePending || memoryPedestalContactLocked){
+        return;
     }
 
-    if(memoryUnlockedPopupElement){
-        memoryUnlockedPopupElement.style.display = "block";
+    memoryCheckpointSavePending = true;
+    memoryPedestalContactLocked = true;
 
-        setTimeout(function(){
-            memoryUnlockedPopupElement.style.display = "none";
-        }, 2000);
-    }
+    const loadedSave = PIXFEW_SAVE.getLoadedSave();
+    const currentAct = loadedSave && loadedSave.save
+        ? loadedSave.save.current_act
+        : 1;
+
+    PIXFEW_SAVE.saveCheckpoint({
+        currentAct,
+        currentRoom: String(currentRoom),
+        checkpoint: memoryPedestalCheckpoint.name,
+        position: memoryPedestalCheckpoint.respawn,
+        extraData: {
+            fragment_placed: true
+        }
+    }).then(function(){
+        confirmMemoryPedestalDelivery();
+    }).catch(function(error){
+        memoryCheckpointSavePending = false;
+        console.error("Não foi possível confirmar o checkpoint do pedestal.", error);
+    });
 }
 
 //faz o fragmento orbitar o player enquanto ele esta sendo carregado
@@ -112,7 +174,7 @@ function updateMemoryFragmentFollower(deltaTime){
 
     if(memoryFragmentDelivered){
         memoryFragmentElement.classList.remove("following");
-        memoryFragmentElement.style.display = "none";
+        updateMemoryFragmentVisibility();
         return;
     }
 

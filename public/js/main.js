@@ -11,7 +11,7 @@ function gameLoop(currentTime){
         deltaTime = 2;
     }
 
-    if(roomTransitionMovementLocked){
+    if(initialRevealMovementLocked){
         player.style.left = x + "px";
         player.style.top = y + "px";
         requestAnimationFrame(gameLoop);
@@ -47,23 +47,25 @@ function gameLoop(currentTime){
 
     //dash horizontal com colisao e cooldown
     if(isDashing){
-        x += facingDirection * dashSpeed * deltaTime;
+        if(!roomEntryControlsLocked){
+            x += facingDirection * dashSpeed * deltaTime;
 
-        const dashPlayerBox = {
-            x: x,
-            y: y,
-            width: hitbox.width,
-            height: hitbox.height
-        };
+            const dashPlayerBox = {
+                x: x,
+                y: y,
+                width: hitbox.width,
+                height: hitbox.height
+            };
 
-        if(checkWallCollision(dashPlayerBox)){
-            x -= facingDirection * dashSpeed * deltaTime;
-            isDashing = false;
-            dashTime = 0;
+            if(checkWallCollision(dashPlayerBox)){
+                x -= facingDirection * dashSpeed * deltaTime;
+                isDashing = false;
+                dashTime = 0;
 
-            setTimeout(function(){
-                dashCooldown = false;
-            }, 500);
+                setTimeout(function(){
+                    dashCooldown = false;
+                }, 500);
+            }
         }
 
         dashTime -= deltaTime;
@@ -80,7 +82,7 @@ function gameLoop(currentTime){
     player.classList.toggle("dashing", isDashing);
 
     //movimentação horizontal
-    if(controls.moveRight){
+    if(!roomEntryControlsLocked && controls.moveRight){
         x += speed * deltaTime;
 
         facingDirection = 1;
@@ -97,7 +99,7 @@ function gameLoop(currentTime){
         }
     }
 
-    if(controls.moveLeft){
+    if(!roomEntryControlsLocked && controls.moveLeft){
         x -= speed * deltaTime;
 
         facingDirection = -1;
@@ -233,13 +235,7 @@ function gameLoop(currentTime){
         }
     }
 
-    //se cair no buraco da área 5, vai para area6
     updateMobileInteractionButton();
-
-    if(currentRoom === 5 && checkColision(playerBox, downExitArea)){
-        currentRoom = 6;
-        loadRoom();
-    }
 
     //fragmento de memória(popup)
     if(currentRoom === 6 && memoryFragmentElement && checkColision(playerBox, memoryFragment)){
@@ -262,6 +258,64 @@ function gameLoop(currentTime){
 resizeGame();
 window.addEventListener("resize", resizeGame);
 
-//inicia o loop do jogo
-loadRoom();
-requestAnimationFrame(gameLoop);
+function applyPlayerPosition(){
+    player.style.left = x + "px";
+    player.style.top = y + "px";
+}
+
+function applySavePosition(saveData){
+    x = Number(saveData.save.position.x);
+    y = Number(saveData.save.position.y);
+    velocityY = 0;
+
+    applyPlayerPosition();
+}
+
+function restoreLoadedSaveProgress(saveData){
+    if(saveData.save.checkpoint !== "pedestal_fragmento"){
+        return;
+    }
+
+    const savedRoom = Number(saveData.save.current_room);
+
+    if(Number.isInteger(savedRoom) && rooms[savedRoom]){
+        currentRoom = savedRoom;
+    }
+
+    restoreMemoryCheckpoint(saveData);
+}
+
+//Bootstrap reutilizavel pelo carregamento automatico e pelo futuro botao "Continuar".
+let gameLoopStarted = false;
+
+async function initializeGame(saveReference = PIXFEW_SAVE.getSaveReference()){
+    let saveData = null;
+
+    try{
+        saveData = await PIXFEW_SAVE.loadSave(saveReference);
+    }catch(error){
+        console.error("Não foi possível carregar o save. Usando a posição padrão.", error);
+    }
+
+    if(saveData){
+        restoreLoadedSaveProgress(saveData);
+    }
+
+    //Mantem toda a inicializacao existente e usa seu spawn como fallback.
+    loadRoom();
+
+    if(saveData){
+        applySavePosition(saveData);
+    }else{
+        applyPlayerPosition();
+    }
+
+    if(!gameLoopStarted){
+        gameLoopStarted = true;
+        requestAnimationFrame(gameLoop);
+    }
+
+    revealInitialCover();
+}
+
+initializeGame();

@@ -37,6 +37,23 @@ let emergePeakY = 0;
 let emergeProgress = 0;
 let emergeSpeed = 18;
 
+//margem curta sem comandos depois que uma troca normal termina
+const roomEntryControlLockDuration = 300;
+let roomEntryControlsLocked = false;
+let roomEntryControlsUnlockTimer = null;
+
+function startRoomEntryControlLock(){
+    if(roomEntryControlsUnlockTimer){
+        clearTimeout(roomEntryControlsUnlockTimer);
+    }
+
+    roomEntryControlsLocked = true;
+    roomEntryControlsUnlockTimer = setTimeout(function(){
+        roomEntryControlsLocked = false;
+        roomEntryControlsUnlockTimer = null;
+    }, roomEntryControlLockDuration);
+}
+
 //spawn vindo de outras paginas do menu/pausa, usado antes do sistema de salas atual carregar
 const spawnPoint = localStorage.getItem("spawnPoint");
 
@@ -155,6 +172,7 @@ function enterDoor(){
     nextSpawn = "fromLeft";
 
     loadRoom();
+    startRoomEntryControlLock();
 }
 
 //hitbox do player (tamanho lógico pra colisão)
@@ -169,16 +187,27 @@ const hitbox = {
 document.addEventListener("keydown", function(event){
 
     const actions = getControlActions(event);
+    //Guarda teclas pressionadas durante bloqueios temporarios para retomar sem novo keydown.
+    setControlState(actions, true);
 
-    if(roomTransitionMovementLocked){
+    if(initialRevealMovementLocked){
+        return;
+    }
+
+    //a pausa continua disponível durante a margem curta de entrada na sala
+    if(event.key === "Escape"){
+        localStorage.setItem("lastArea", window.location.pathname);
+        window.location.href = "pause.html";
+        return;
+    }
+
+    if(roomEntryControlsLocked){
         return;
     }
 
     if(actions.dash){
         tryDash();
     }
-
-    setControlState(actions, true);
 
     if(canEnterDoor && actions.interact){
         if(event.key === "Enter" || !event.repeat){
@@ -194,12 +223,6 @@ document.addEventListener("keydown", function(event){
 
     if(actions.jump){
         tryJump();
-    }
-
-    //abre o menu de pausa ao apertar ESC
-    if(event.key === "Escape"){
-        localStorage.setItem("lastArea", window.location.pathname);
-        window.location.href = "pause.html";
     }
 
 });
@@ -280,17 +303,18 @@ if(mobileControlsElement){
         button.addEventListener("pointerdown", function(event){
             event.preventDefault();
 
-            if(roomTransitionMovementLocked){
-                return;
-            }
-
             const controlName = button.dataset.control;
             const actions = getMobileActions(controlName);
 
             activeMobilePointers.set(event.pointerId, { button, controlName });
             button.setPointerCapture(event.pointerId);
             button.classList.add("is-pressed");
+            //Preserva o toque ativo para o primeiro frame liberado depois do bloqueio.
             setControlState(actions, true, mobileControlState);
+
+            if(initialRevealMovementLocked || roomEntryControlsLocked){
+                return;
+            }
 
             if(actions.dash){
                 tryDash();

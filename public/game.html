@@ -9,8 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="styles/style.css">
-    <script src="js/app-config.js"></script>
+    <link rel="stylesheet" href="styles/style.css?v=checkpoint-1">
+    <script src="js/app-config.js?v=accounts-1"></script>
 </head>
 <body>
     <header>
@@ -26,7 +26,7 @@
                 <span></span>
             </div>
             <div id="damage-flash"></div>
-            <div id="room-transition"></div>
+            <div id="initial-cover"></div>
             <div id="wall-left"></div>
             <div id="wall-right-top"></div>
             <div id="wall-right-bottom"></div>
@@ -143,15 +143,16 @@
 
     <!-- ordem importante: estados globais e elementos precisam existir antes do loop principal -->
     <script src="js/ui.js"></script>
+    <script src="js/save.js?v=accounts-1"></script>
     <script src="js/player.js"></script>
     <script src="js/effects.js"></script>
     <script src="js/rooms.js"></script>
     <script src="js/collisions.js"></script>
     <script src="js/health.js"></script>
     <script src="js/transitions.js"></script>
-    <script src="js/objectives.js"></script>
+    <script src="js/objectives.js?v=checkpoint-1"></script>
     <script src="js/debug.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=checkpoint-1"></script>
     <footer>
         
     </footer>

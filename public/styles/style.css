@@ -362,19 +362,19 @@ h1{
     100%{ background-color: rgba(220, 20, 60, 0); }
 }
 
-#room-transition{
+#initial-cover{
     position: absolute;
     inset: 0;
     z-index: 30;
     pointer-events: none;
-    background-color: rgba(5, 8, 18, 0);
+    background-color: rgba(0, 0, 0, 1);
 }
 
-#room-transition.active{
-    animation: roomTransitionFade 2s ease-out;
+#initial-cover.revealing{
+    animation: initialCoverFade 2s ease-out forwards;
 }
 
-@keyframes roomTransitionFade{
+@keyframes initialCoverFade{
     0%{ background-color: rgba(0, 0, 0, 1); }
     100%{ background-color: rgba(0, 0, 0, 0); }
 }
@@ -895,6 +895,11 @@ h1{
     background-image: url("../assets/sprites/fragmentos/frag1.png");
     animation: none;
     filter: none;
+}
+
+#memory-fragment.on-pedestal{
+    background-image: url("../assets/sprites/fragmentos/frag1.png");
+    animation: memoryFragmentGlow 2.4s ease-in-out infinite;
 }
 
 @keyframes memoryFragmentGlow{
