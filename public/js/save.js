@@ -8,16 +8,15 @@
     const saveLoadTimeout = 3000;
 
     let loadedSaveData = null;
-    let authenticatedIdentity = null;
-
-    function validatePositiveInteger(value, fieldName){
-        if(!Number.isInteger(value) || value <= 0){
-            throw new TypeError(fieldName + " deve ser um inteiro positivo.");
-        }
-    }
 
     function getMode(){
         const mode = global.PIXFEW_CONFIG.save.mode;
+
+        if(mode === null){
+            const error = new Error("Nenhum modo de jogo foi selecionado.");
+            error.code = "MODE_REQUIRED";
+            throw error;
+        }
 
         if(mode !== saveModes.account && mode !== saveModes.guest){
             throw new Error("O modo de save configurado é inválido.");
@@ -26,35 +25,10 @@
         return mode;
     }
 
-    function provideAuthenticatedIdentity(reference){
-        validatePositiveInteger(reference && reference.playerId, "playerId");
-        validatePositiveInteger(reference && reference.slot, "slot");
-
-        /*
-         * PONTO DE INTEGRAÇÃO DO LOGIN FUTURO:
-         * o bootstrap de uma sessão autenticada deverá chamar esta função antes
-         * de initializeGame(). A identidade recebida aqui organiza o frontend;
-         * a API real deverá autorizar o jogador pela sessão do servidor, nunca
-         * confiar no playerId enviado pelo navegador.
-         */
-        authenticatedIdentity = Object.freeze({
-            playerId: reference.playerId,
-            slot: reference.slot
-        });
-    }
-
     function getSaveReference(){
-        if(getMode() === saveModes.guest){
-            return null;
-        }
-
-        const reference = authenticatedIdentity ||
-            global.PIXFEW_CONFIG.save.developmentAccount;
-
-        validatePositiveInteger(reference.playerId, "playerId");
-        validatePositiveInteger(reference.slot, "slot");
-
-        return reference;
+        return getMode() === saveModes.guest ? null : Object.freeze({
+            mode: saveModes.account
+        });
     }
 
     function validateSaveResponse(payload){
@@ -75,18 +49,19 @@
         return payload.data;
     }
 
-    function createEndpoint(reference){
-        validatePositiveInteger(reference.playerId, "playerId");
-        validatePositiveInteger(reference.slot, "slot");
-
-        const endpoint = new URL(
+    function createEndpoint(){
+        return new URL(
             global.PIXFEW_CONFIG.apiBaseUrl.replace(/\/$/, "") + "/save.php"
         );
-
-        return endpoint;
     }
 
     async function parseSaveResponse(response){
+        if(response.status === 401){
+            const error = new Error("A sessão do administrador expirou ou não é válida.");
+            error.code = "ADMIN_AUTH_REQUIRED";
+            throw error;
+        }
+
         if(!response.ok){
             throw new Error("Não foi possível processar o save (HTTP " + response.status + ").");
         }
@@ -97,7 +72,7 @@
         return saveData;
     }
 
-    async function loadSave(reference = getSaveReference(), { signal } = {}){
+    async function loadSave({ signal } = {}){
         if(getMode() === saveModes.guest){
             loadedSaveData = null;
             return null;
@@ -123,12 +98,8 @@
             requestController.abort();
         }, saveLoadTimeout);
 
-        const endpoint = createEndpoint(reference);
-        endpoint.searchParams.set("player_id", String(reference.playerId));
-        endpoint.searchParams.set("slot", String(reference.slot));
-
         try{
-            const response = await global.fetch(endpoint, {
+            const response = await global.fetch(createEndpoint(), {
                 method: "GET",
                 headers: {
                     Accept: "application/json"
@@ -177,15 +148,12 @@
         return loadedSaveData;
     }
 
-    async function saveCheckpoint(checkpointData, reference = getSaveReference(), { signal } = {}){
+    async function saveCheckpoint(checkpointData, { signal } = {}){
         if(getMode() === saveModes.guest){
             return saveGuestCheckpoint(checkpointData);
         }
 
-        const endpoint = createEndpoint(reference);
         const payload = {
-            player_id: reference.playerId,
-            slot: reference.slot,
             current_act: checkpointData.currentAct,
             current_room: checkpointData.currentRoom,
             checkpoint: checkpointData.checkpoint,
@@ -193,7 +161,7 @@
             extra_data: checkpointData.extraData
         };
 
-        const response = await global.fetch(endpoint, {
+        const response = await global.fetch(createEndpoint(), {
             method: "PATCH",
             headers: {
                 Accept: "application/json",
@@ -210,12 +178,17 @@
         return loadedSaveData;
     }
 
+    function returnToModeSelection(){
+        global.PIXFEW_MODE_SELECTION.clear();
+        global.location.replace("menu.html");
+    }
+
     global.PIXFEW_SAVE = Object.freeze({
         getMode,
         getSaveReference,
-        provideAuthenticatedIdentity,
         loadSave,
         saveCheckpoint,
-        getLoadedSave
+        getLoadedSave,
+        returnToModeSelection
     });
 })(window);

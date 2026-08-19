@@ -9,23 +9,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/style.css?v=0.1.5-bg2">
     <script src="js/app-config.js"></script>
 </head>
 <body class="menu-page">
     <header>
-        <h2 class="version">v0.1.4</h2>
+        <h2 class="version">v0.1.5</h2>
     </header>
 
     <h1 class="logo">PIXFEW</h1>
 
     <div class="config-buttons">
         
-        <a href="#" class="button button-config">
+        <a href="#" class="button button-config" data-coming-soon>
             Áudio
         </a>
         
-        <a href="#" class="button button-config">
+        <a href="#" class="button button-config" data-coming-soon>
             Tela
         </a>
         
@@ -33,9 +33,21 @@
             Voltar
         
         </a>
+
+        <p id="config-message" class="entry-message" role="status" aria-live="polite"></p>
     </div>
     <footer>
 
     </footer>
+    <script>
+        const configMessage = document.getElementById("config-message");
+
+        document.querySelectorAll("[data-coming-soon]").forEach(function(option){
+            option.addEventListener("click", function(event){
+                event.preventDefault();
+                configMessage.textContent = "Em breve";
+            });
+        });
+    </script>
 </body>
 </html>

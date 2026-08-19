@@ -9,33 +9,40 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/style.css?v=0.1.5-bg2">
     <script src="js/app-config.js"></script>
 </head>
-<body class="menu-page">
+<body class="menu-page main-menu-page">
     <header>
-        <h2 class="version">v0.1.4</h2>
+        <h2 class="version">v0.1.5</h2>
     </header>
 
-    <h1 class="logo">PIXFEW </h1>
+    <h1 class="logo">PIXFEW</h1>
 
-    <div class="menu-buttons">
+    <main id="main-menu" class="profile-selection" aria-label="Ações do jogo" hidden>
+        <section>
+            <div class="menu-buttons">
+                <button id="start-game" type="button" class="button button-menu">
+                    Iniciar jogo
+                </button>
 
-    <a href="game.html" class="button button-menu">
-        Iniciar
-    </a>
+                <a href="config.html" class="button button-menu">
+                    Configurações
+                </a>
 
-    <a href="config.html" class="button button-menu">
-        Configurações
-    </a>
+                <button id="exit-game" type="button" class="button button-menu">
+                    Sair do jogo
+                </button>
+            </div>
+        </section>
+    </main>
 
-    <a href="index.html" class="button button-menu">
-        Sair do jogo
-    </a>
-
-    </div>
-    <footer>
-        
+    <footer id="account-details" class="account-details" hidden>
+        <span>Conta ativa: Administrador</span>
+        <span>ID: 1</span>
+        <span>Slot: 1</span>
     </footer>
+
+    <script src="js/menu.js?v=entry-flow-1"></script>
 </body>
 </html>

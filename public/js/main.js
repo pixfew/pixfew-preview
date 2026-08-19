@@ -288,13 +288,29 @@ function restoreLoadedSaveProgress(saveData){
 //Bootstrap reutilizavel pelo carregamento automatico e pelo futuro botao "Continuar".
 let gameLoopStarted = false;
 
-async function initializeGame(saveReference = PIXFEW_SAVE.getSaveReference()){
+async function initializeGame(){
     let saveData = null;
+    let saveMode = null;
 
     try{
-        saveData = await PIXFEW_SAVE.loadSave(saveReference);
+        saveMode = PIXFEW_SAVE.getMode();
+        saveData = await PIXFEW_SAVE.loadSave();
     }catch(error){
+        if(
+            error &&
+            (error.code === "MODE_REQUIRED" || error.code === "ADMIN_AUTH_REQUIRED")
+        ){
+            PIXFEW_SAVE.returnToModeSelection();
+            return;
+        }
+
         console.error("Não foi possível carregar o save. Usando a posição padrão.", error);
+    }
+
+    // Account nunca inicia com fallback sem confirmar a sessão e consultar o save.
+    if(saveMode === "account" && !saveData){
+        PIXFEW_SAVE.returnToModeSelection();
+        return;
     }
 
     if(saveData){

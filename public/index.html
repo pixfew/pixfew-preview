@@ -4,32 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PIXFEW</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="styles/style.css">
+
+    <link rel="stylesheet" href="styles/style.css?v=0.1.5-bg2">
     <script src="js/app-config.js"></script>
 </head>
-<body class="menu-page intro-page">
+<body class="menu-page entry-page">
     <header>
-        <h2 class="version">v0.1.4</h2>
+        <h2 class="version">v0.1.5</h2>
     </header>
-    <h1 class="development-warning">
-        ⚠ Jogo em desenvolvimento
-    </h1>
-    
-    <div class="buttons">
 
-        <a href="menu.html" class="button">
-            Começar
-        
-        </a>
+    <h1 class="logo">PIXFEW</h1>
 
-    </div>
-    <footer>
-        
-    </footer>
+    <main class="profile-selection" aria-label="Entrada">
+        <section id="entry-options">
+            <div class="menu-buttons">
+                <button id="show-admin-login" type="button" class="button button-menu">
+                    Login
+                </button>
+
+                <button id="create-account" type="button" class="button button-menu">
+                    Criar conta
+                </button>
+
+                <button id="play-guest" type="button" class="button button-menu button-guest">
+                    Entrar como convidado
+                </button>
+            </div>
+
+            <p id="entry-message" class="entry-message" role="status" aria-live="polite"></p>
+        </section>
+
+        <section id="admin-login" class="admin-panel" aria-labelledby="admin-login-title" hidden>
+            <h2 id="admin-login-title">Administrador de desenvolvimento</h2>
+
+            <form id="admin-login-form">
+                <label for="admin-password">Senha de desenvolvimento</label>
+                <input
+                    id="admin-password"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                >
+                <p id="admin-login-message" class="form-message" role="status" aria-live="polite"></p>
+                <button type="submit" class="button button-menu">Entrar</button>
+                <button id="cancel-admin-login" type="button" class="button button-menu button-secondary">
+                    Voltar
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <script src="js/menu.js?v=entry-flow-1"></script>
 </body>
 </html>
